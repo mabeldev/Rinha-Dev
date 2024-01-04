@@ -1,58 +1,47 @@
-from django.contrib import auth, messages
-from django.contrib.auth.models import User
-from django.shortcuts import redirect, render
+import webbrowser
 
-from apps.usuarios.forms import CadastroForms, LoginForms
+import requests
+from django.shortcuts import redirect
+
+from setup.settings import (
+    GITHUB_ACCESS_TOKEN_URL,
+    GITHUB_AUTH_URL,
+    GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET,
+    GITHUB_REDIRECT_URI,
+)
 
 
 def login(request):
-    form = LoginForms()
-
-    if request.method == "POST":
-        form = LoginForms(request.POST)
-
-        if form.is_valid():
-            nome = form["nome_login"].value()
-            senha = form["senha"].value()
-
-        usuario = auth.authenticate(request, username=nome, password=senha)
-        if usuario is not None:
-            auth.login(request, usuario)
-            messages.success(request, f"{nome} logado com sucesso!")
-            return redirect("index")
-        else:
-            messages.error(request, "Erro ao efetuar login")
-            return redirect("login")
-
-    return render(request, "usuarios/login.html", {"form": form})
+    webbrowser.open(GITHUB_AUTH_URL)
+    redirect(url="index")
 
 
-def cadastro(request):
-    form = CadastroForms()
+def callback_view(request):
+    code = request.GET.get("code")
 
-    if request.method == "POST":
-        form = CadastroForms(request.POST)
+    payload = {
+        "client_id": GITHUB_CLIENT_ID,
+        "client_secret": GITHUB_CLIENT_SECRET,
+        "code": code,
+        "redirect_uri": GITHUB_REDIRECT_URI,
+    }
 
-        if form.is_valid():
-            nome = form["nome_cadastro"].value()
-            email = form["email"].value()
-            senha = form["senha_1"].value()
+    response = requests.post(
+        GITHUB_ACCESS_TOKEN_URL,
+        data=payload,
+        headers={"Accept": "application/json"},
+    )
 
-            if User.objects.filter(username=nome).exists():
-                messages.error(request, "Usuário já existente")
-                return redirect("cadastro")
-
-            usuario = User.objects.create_user(
-                username=nome, email=email, password=senha
-            )
-            usuario.save()
-            messages.success(request, "Cadastro efetuado com sucesso!")
-            return redirect("login")
-
-    return render(request, "usuarios/cadastro.html", {"form": form})
+    if response.status_code == 200:
+        access_token = response.json()["access_token"]
+        print(access_token)
+        return redirect(to="index")
+    else:
+        print("Erro ao obter token de acesso.")
+        return redirect(to="index")
 
 
 def logout(request):
-    auth.logout(request)
-    messages.success(request, "Logout efetuado com sucesso!")
-    return redirect("login")
+    redirect
+    logout(request)

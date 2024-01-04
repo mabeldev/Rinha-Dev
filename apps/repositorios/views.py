@@ -2,4 +2,4 @@ from django.shortcuts import render
 
 
 def index(request):
-    return render(request, "rinha/index.html")
+    return render(request, "repositorios/index.html")
