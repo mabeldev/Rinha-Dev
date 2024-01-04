@@ -1,6 +1,6 @@
-import webbrowser
-
 import requests
+from django.contrib import auth, messages
+from django.contrib.auth.models import User
 from django.shortcuts import redirect
 
 from setup.settings import (
@@ -13,11 +13,43 @@ from setup.settings import (
 
 
 def login(request):
-    webbrowser.open(GITHUB_AUTH_URL)
-    redirect(url="index")
+    return redirect(GITHUB_AUTH_URL)
+
+
+def logout(request):
+    auth.logout(request)
+    messages.success(request, "Logout efetuado com sucesso!")
+    return redirect("index")
 
 
 def callback_view(request):
+    access_token = get_user_token(request)
+
+    if not access_token:
+        return messages.error(
+            request, "Erro ao tentar realizar login com o Github"
+        )
+
+    user_data = get_user_data_json(access_token)
+    usuario = add_or_update_user(user_data, access_token)
+    authorize_user(request, usuario)
+    return redirect("index")
+
+
+def get_user_data_json(access_token):
+    headers = {
+        "Authorization": f"token {access_token}",
+        "Accept": "application/json",
+    }
+    user_data = requests.get("https://api.github.com/user", headers=headers)
+
+    if user_data.status_code == 200:
+        return user_data.json()
+    else:
+        return None
+
+
+def get_user_token(request):
     code = request.GET.get("code")
 
     payload = {
@@ -34,14 +66,33 @@ def callback_view(request):
     )
 
     if response.status_code == 200:
-        access_token = response.json()["access_token"]
-        print(access_token)
-        return redirect(to="index")
+        access_token = str(response.json()["access_token"])
+        return access_token
     else:
-        print("Erro ao obter token de acesso.")
-        return redirect(to="index")
+        return None
 
 
-def logout(request):
-    redirect
-    logout(request)
+def add_or_update_user(user_data, access_token):
+    username = user_data["login"]
+    email = user_data["email"]
+
+    usuario = User.objects.filter(email=user_data["email"]).first()
+    if usuario:
+        usuario.access_token = access_token
+        usuario.save()
+    else:
+        usuario = User.objects.create_user(
+            username=username,
+            email=email,
+            access_token=access_token,
+        )
+        usuario.save()
+    return usuario
+
+
+def authorize_user(request, usuario):
+    try:
+        auth.login(request, usuario)
+        messages.success(request, "Login realizado com sucesso")
+    except auth.AuthenticationFailed:
+        messages.error(request, "Erro ao tentar realizar login")
