@@ -22,10 +22,6 @@ def list_repositorio_views(request):
             issues_url = repo["issues_url"].replace("{/number}", "")
             pulls_url = repo["pulls_url"].replace("{/number}", "")
 
-            get_all_api_requests_datas(
-                request, commits_url, languages_url, issues_url, pulls_url
-            )
-
             commit_count = get_commit_count(request, commits_url)
 
             line_count, languages = get_line_count(request, languages_url)
@@ -84,10 +80,10 @@ def get_line_count(request, languages_url):
         for language, lines in response.json().items():
             line_count += lines
             languages.append(language)
-        languages = str(languages)
         languages = (
-            languages.replace("'", "").replace("[", "").replace("]", "")
+            str(languages).replace("'", "").replace("[", "").replace("]", "")
         )
+
         print(languages)
         return line_count, languages
 
@@ -116,18 +112,3 @@ def get_pulls_count(request, pulls_url):
             if pull["state"] == "closed":
                 pulls_count += 1
         return pulls_count
-
-
-def get_all_api_requests_datas(
-    request, commits_url, languages_url, issues_url, pulls_url
-):
-    commits_response = requests.get(
-        commits_url,
-        headers={"Authorization": f"Bearer {request.user.access_token}"},
-    )
-
-    commit_count = 0
-    for commit in commits_response.json():
-        if commit["commit"]["author"]["email"] == request.user.email:
-            commit_count += 1
-    return commit_count
