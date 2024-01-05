@@ -1,0 +1,4 @@
+.nav-item.active .nav-link {
+    color: #ff0000; /* Muda a cor do texto para vermelho */
+    background-color: #f8f9fa; /* Muda a cor de fundo para cinza claro */
+}

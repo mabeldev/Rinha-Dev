@@ -10,19 +10,28 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-from pathlib import Path
+from pathlib import Path, os
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# GITHUB PATHS
+GITHUB_OAUTH_URL = str(os.getenv("GITHUB_OAUTH_URL"))
+GITHUB_CLIENT_ID = str(os.getenv("GITHUB_CLIENT_ID"))
+GITHUB_REDIRECT_URI = str(os.getenv("GITHUB_REDIRECT_URI"))
+GITHUB_CLIENT_SECRET = str(os.getenv("GITHUB_CLIENT_SECRET"))
+GITHUB_GET_USER_CODE = f"{GITHUB_OAUTH_URL}authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}&scope=user"
+GITHUB_ACCESS_TOKEN_URL = f"{GITHUB_OAUTH_URL}access_token"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "django-insecure-0py_c06c0d2e!&_yw-k6+2rih741l7^%xrb12b!30a+&&$%o+e"
-)
+SECRET_KEY = str(os.getenv("SECRET_KEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,6 +48,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "apps.usuarios.apps.UsuariosConfig",
+    "apps.repositorios.apps.RepositoriosConfig",
 ]
 
 MIDDLEWARE = [
@@ -56,7 +67,7 @@ ROOT_URLCONF = "setup.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -123,3 +134,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Custom Auth user
+AUTH_USER_MODEL = "usuarios.CustomUser"
