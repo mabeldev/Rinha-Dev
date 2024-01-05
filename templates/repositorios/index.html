@@ -1,59 +1,23 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Rinha Dev</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-</head>
-
-<body>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="#">Logo</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item active">
-                            <a class="nav-link" href="index.html">Inicio</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="rank.html">Ranking</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="novidades.html">Novidades</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="projetos.html">Projetos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="sobre.html">Sobre</a>
-                        </li>
-                    </ul>
-                </div>
-                <a class="btn btn-success btn-lg" href="{% url 'login' %}" role="button">Login com GitHub</a>
-            </div>
-        </nav>
-    </header>
-    <main class="container mt-5">
-        <div class="row">
-            <div class="col-lg-6">
-                <h1>Bem-vindo ao Rinha Dev</h1>
-                <p>Descrição do projeto...</p>
-                <a class="btn btn-success btn-lg" href="#" role="button">Login com GitHub</a>
-            </div>
-            <div class="col-lg-6">
-                <img src="https://via.placeholder.com/500x300" class="img-fluid" alt="Imagem CTA">
-            </div>
+{% extends 'shared/base.html' %}
+{% block content %}
+<main class="container mt-5">
+    <div class="row">
+        <div class="col-lg-6">
+            <h1>Bem-vindo ao Rinha Dev</h1>
+            <p>Descrição do projeto...</p>
+            {% if user.is_authenticated %}
+            <a class="btn btn-success btn-lg" href="#" role="button">Meus Projetos</a>
+            {% else %}
+            <a class="btn btn-success btn-lg" href="{% url 'login' %}" role="button">Login com GitHub</a>
+            {% endif %}
         </div>
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <div class="col-lg-6">
+            <img src="https://via.placeholder.com/500x300" class="img-fluid" alt="Imagem CTA">
+        </div>
+    </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
+{% endblock %}
