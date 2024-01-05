@@ -18,17 +18,20 @@ load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-GITHUB_AUTH_URL = os.getenv("GITHUB_AUTH_URL")
-GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
-GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
-GITHUB_REDIRECT_URI = os.getenv("GITHUB_REDIRECT_URI")
-GITHUB_ACCESS_TOKEN_URL = os.getenv("GITHUB_ACCESS_TOKEN_URL")
+
+# GITHUB PATHS
+GITHUB_OAUTH_URL = str(os.getenv("GITHUB_OAUTH_URL"))
+GITHUB_CLIENT_ID = str(os.getenv("GITHUB_CLIENT_ID"))
+GITHUB_REDIRECT_URI = str(os.getenv("GITHUB_REDIRECT_URI"))
+GITHUB_CLIENT_SECRET = str(os.getenv("GITHUB_CLIENT_SECRET"))
+GITHUB_GET_USER_CODE = f"{GITHUB_OAUTH_URL}authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}&scope=user"
+GITHUB_ACCESS_TOKEN_URL = f"{GITHUB_OAUTH_URL}access_token"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = str(os.getenv("SECRET_KEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

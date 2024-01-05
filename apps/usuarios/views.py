@@ -5,15 +5,15 @@ from django.shortcuts import redirect
 
 from setup.settings import (
     GITHUB_ACCESS_TOKEN_URL,
-    GITHUB_AUTH_URL,
     GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET,
+    GITHUB_GET_USER_CODE,
     GITHUB_REDIRECT_URI,
 )
 
 
 def login(request):
-    return redirect(GITHUB_AUTH_URL)
+    return redirect(GITHUB_GET_USER_CODE)
 
 
 def logout(request):
