@@ -1,8 +1,8 @@
 import requests
 from django.contrib import auth, messages
-from django.contrib.auth.models import User
 from django.shortcuts import redirect
 
+from apps.usuarios.models import CustomUser
 from setup.settings import (
     GITHUB_ACCESS_TOKEN_URL,
     GITHUB_CLIENT_ID,
@@ -76,17 +76,16 @@ def add_or_update_user(user_data, access_token):
     username = user_data["login"]
     email = user_data["email"]
 
-    usuario = User.objects.filter(email=user_data["email"]).first()
+    usuario = CustomUser.objects.filter(email=email).first()
     if usuario:
         usuario.access_token = access_token
         usuario.save()
     else:
-        usuario = User.objects.create_user(
+        usuario = CustomUser.objects.create_user(
             username=username,
             email=email,
             access_token=access_token,
         )
-        usuario.save()
     return usuario
 
 
