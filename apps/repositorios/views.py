@@ -1,4 +1,7 @@
+import concurrent.futures
+
 import requests
+from django.contrib import messages
 from django.shortcuts import render
 
 from apps.repositorios.models import Repositorio
@@ -14,38 +17,23 @@ def list_repositorio_views(request):
         GITHUB_GET_REPOSITORIES,
         headers={"Authorization": f"Bearer {request.user.access_token}"},
     )
-    repositorios = []
     if response.status_code == 200:
-        for repo in response.json():
-            commits_url = repo["commits_url"].replace("{/sha}", "")
-            languages_url = repo["languages_url"]
-            issues_url = repo["issues_url"].replace("{/number}", "")
-            pulls_url = repo["pulls_url"].replace("{/number}", "")
+        repositorios_json = response.json()
+        repositorios = []
 
-            commit_count = get_commit_count(request, commits_url)
-
-            line_count, languages = get_line_count(request, languages_url)
-
-            closed_issues = get_closed_issues_count(request, issues_url)
-
-            pulls_count = get_pulls_count(request, pulls_url)
-
-            repositorio = Repositorio(
-                nome=repo["name"],
-                project_id=repo["id"],
-                criador=repo["owner"]["login"],
-                project_url=repo["html_url"],
-                linguagens=languages,
-                commits_url=commits_url,
-                pulls_url=pulls_url,
-                languages_url=languages_url,
-                commit_count=commit_count,
-                line_count=line_count,
-                closed_issues_count=closed_issues,
-                pulls_count=pulls_count,
-                estrelas=repo["stargazers_count"],
-            )
-            repositorios.append(repositorio)
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = {
+                executor.submit(process_repository, request, repo): repo
+                for repo in repositorios_json
+            }
+            for future in concurrent.futures.as_completed(futures):
+                try:
+                    repositorio = future.result()
+                    repositorios.append(repositorio)
+                except Exception:
+                    messages.error(
+                        request, "Erro ao tentar processar o repositorio"
+                    )
         return render(
             request,
             "repositorios/repositorios.html",
@@ -54,6 +42,35 @@ def list_repositorio_views(request):
     else:
         print(response.status_code)
         return render(request, "repositorios/repositorios.html")
+
+
+def process_repository(request, repo):
+    commits_url = repo["commits_url"].replace("{/sha}", "")
+    languages_url = repo["languages_url"]
+    issues_url = repo["issues_url"].replace("{/number}", "")
+    pulls_url = repo["pulls_url"].replace("{/number}", "")
+
+    commit_count = get_commit_count(request, commits_url)
+    line_count, languages = get_line_count(request, languages_url)
+    closed_issues = get_closed_issues_count(request, issues_url)
+    pulls_count = get_pulls_count(request, pulls_url)
+
+    repositorio = Repositorio(
+        nome=repo["name"],
+        project_id=repo["id"],
+        criador=repo["owner"]["login"],
+        project_url=repo["html_url"],
+        linguagens=languages,
+        commits_url=commits_url,
+        pulls_url=pulls_url,
+        languages_url=languages_url,
+        commit_count=commit_count,
+        line_count=line_count,
+        closed_issues_count=closed_issues,
+        pulls_count=pulls_count,
+        estrelas=repo["stargazers_count"],
+    )
+    return repositorio
 
 
 def get_commit_count(request, commits_url):
@@ -83,8 +100,6 @@ def get_line_count(request, languages_url):
         languages = (
             str(languages).replace("'", "").replace("[", "").replace("]", "")
         )
-
-        print(languages)
         return line_count, languages
 
 
