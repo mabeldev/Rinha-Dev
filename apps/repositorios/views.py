@@ -1,10 +1,8 @@
-import concurrent.futures
-
 import requests
 from django.contrib import messages
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
-from apps.repositorios.models import Repositorio
+from apps.repositorios.models import GitRepositorio, Repositorio
 from setup.settings import GITHUB_GET_REPOSITORIES
 
 
@@ -12,7 +10,49 @@ def index(request):
     return render(request, "repositorios/index.html")
 
 
-def list_repositorio_views(request):
+def cadastrar_repositorio(request):
+    if request.method == "POST":
+        repositorio_id = request.POST.get("repositorio_id")
+        repositorio_nome = request.POST.get("repositorio_nome")
+        repositorio_criador = request.POST.get("repositorio_criador")
+        repositorio_stars = request.POST.get("repositorio_stars")
+        repositorio_url = request.POST.get("repositorio_url")
+        commits_count = get_commit_count(request, f"{repositorio_url}/commits")
+        line_count, languages = get_line_count(
+            request, f"{repositorio_url}/languages"
+        )
+        issues_count = get_issues_count(
+            request, f"{repositorio_url}/issues?state=closed"
+        )
+        pulls_count = get_pulls_count(
+            request, f"{repositorio_url}/pulls?state=closed"
+        )
+
+        Repositorio.objects.create(
+            repository_id=repositorio_id,
+            name=repositorio_nome,
+            owner=repositorio_criador,
+            languages=languages,
+            stars=repositorio_stars,
+            commit_count=commits_count,
+            line_count=line_count,
+            issues_count=issues_count,
+            pulls_count=pulls_count,
+        )
+        messages.success(request, "Repositório cadastrado com sucesso!")
+    return redirect("repositorios")
+
+
+def list_repositorio(request):
+    repositorios = Repositorio.objects.filter(owner=request.user)
+    return render(
+        request,
+        "repositorios/repositorios.html",
+        {"repositorios": repositorios},
+    )
+
+
+def list_git_repositorio(request):
     response = requests.get(
         GITHUB_GET_REPOSITORIES,
         headers={"Authorization": f"Bearer {request.user.access_token}"},
@@ -21,27 +61,37 @@ def list_repositorio_views(request):
         repositorios_json = response.json()
         repositorios = []
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            futures = {
-                executor.submit(process_repository, request, repo): repo
-                for repo in repositorios_json
-            }
-            for future in concurrent.futures.as_completed(futures):
-                try:
-                    repositorio = future.result()
-                    repositorios.append(repositorio)
-                except Exception:
-                    messages.error(
-                        request, "Erro ao tentar processar o repositorio"
-                    )
+        for repo in repositorios_json:
+            repositorio = process_git_repository(repo)
+            repositorios.append(repositorio)
+
         return render(
             request,
-            "repositorios/repositorios.html",
+            "repositorios/git_repositorios.html",
             {"repositorios": repositorios},
         )
     else:
-        print(response.status_code)
-        return render(request, "repositorios/repositorios.html")
+        messages.error = f"Erro ao buscar repositórios: {response.status_code}"
+        return redirect("index")
+
+
+def process_git_repository(repo):
+    git_repositorio = GitRepositorio(
+        repository_id=repo["id"],
+        name=repo["name"],
+        owner=repo["owner"]["login"],
+        description=repo["description"],
+        url=repo["url"],
+        stars=repo["stargazers_count"],
+    )
+    if Repositorio.objects.filter(
+        repository_id=git_repositorio.repository_id
+    ).exists():
+        git_repositorio.is_registred = True
+    else:
+        git_repositorio.is_registred = False
+
+    return git_repositorio
 
 
 def process_repository(request, repo):
@@ -103,9 +153,9 @@ def get_line_count(request, languages_url):
         return line_count, languages
 
 
-def get_closed_issues_count(request, issues_url):
+def get_issues_count(request, issues_url):
     response = requests.get(
-        issues_url + "?state=closed",
+        issues_url,
         headers={"Authorization": f"Bearer {request.user.access_token}"},
     )
     if response.status_code == 200:
@@ -118,12 +168,11 @@ def get_closed_issues_count(request, issues_url):
 
 def get_pulls_count(request, pulls_url):
     response = requests.get(
-        pulls_url + "?state=closed",
+        pulls_url,
         headers={"Authorization": f"Bearer {request.user.access_token}"},
     )
     if response.status_code == 200:
         pulls_count = 0
         for pull in response.json():
-            if pull["state"] == "closed":
-                pulls_count += 1
+            pulls_count += 1
         return pulls_count

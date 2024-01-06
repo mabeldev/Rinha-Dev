@@ -3,15 +3,10 @@
 <main class="container mt-5">
     <div class="row">
         <div class="col-lg-6">
-            {% if user.is_authenticated %}
             {% for repositorio in repositorios %}
-            {% if repositorio.ativo %}
-            <h5 class="card-title">{{ repositorio.nome }}  ✅</h5>
-            {% else %}
-            <h5 class="card-title">{{ repositorio.nome }}  ❌</h5>
-            {% endif %}
-            <h6 class="card-text">Criador: {{ repositorio.criador }} </h6>
-            <h6 class="card-text">Linguagems Utilizadas: {{ repositorio.linguagens }} </h6>
+            <h5 class="card-title">{{ repositorio.name }}</h5>
+            <h6 class="card-text">Criador: {{ repositorio.owner }} </h6>
+            <h6 class="card-text">Linguagems Utilizadas: {{ repositorio.languages }} </h6>
             <table class="table">
                 <tbody>
                     <tr class="table-primary">
@@ -24,7 +19,7 @@
                     </tr>
                     <tr class="table-success">
                         <th scope="row">Número de issues resolvidas</th>
-                        <td>{{ repositorio.closed_issues_count }}</td>
+                        <td>{{ repositorio.issues_count }}</td>
                     </tr>
                     <tr class="table-danger">
                         <th scope="row">Número de pull requests aceitos</th>
@@ -32,22 +27,13 @@
                     </tr>
                     <tr class="table-warning">
                         <th scope="row">Número de estrelas</th>
-                        <td>{{ repositorio.estrelas }}</td>
+                        <td>{{ repositorio.stars }}</td>
                     </tr>
                 </tbody>
             </table>
             <div class="buttons">
-                {% if repositorio.ativo %}
-                <a class="btn btn-primary btn-lg" href="#" role="button">Atualizar</a>
-                <a class="btn btn-danger btn-lg" href="#" role="button">Remover</a>
-                {% else %}
-                <a class="btn btn-success btn-lg" href="#" role="button">Adicionar</a>
-                {% endif %}
             </div>
             {% endfor %}
-            {% else %}
-            <a class="btn btn-success btn-lg" href="{% url 'login' %}" role="button">Login com GitHub</a>
-            {% endif %}
         </div>
         <div class="col-lg-6">
         </div>
