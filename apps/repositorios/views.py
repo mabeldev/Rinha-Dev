@@ -106,11 +106,6 @@ def list_repositorio(request):
     repositorios = Repositorio.objects.filter(owner=request.user)
 
     return repositorios
-    return render(
-        request,
-        "repositorios/repositorios.html",
-        {"repositorios": repositorios},
-    )
 
 
 def list_git_repositorio(request):
@@ -127,11 +122,6 @@ def list_git_repositorio(request):
             repositorios.append(repositorio)
 
         return repositorios
-        return render(
-            request,
-            "repositorios/git_repositorios.html",
-            {"repositorios": repositorios},
-        )
     else:
         messages.error = f"Erro ao buscar repositórios: {response.status_code}"
         return redirect("index")
