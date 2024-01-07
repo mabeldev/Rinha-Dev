@@ -4,43 +4,56 @@
     <div class="row">
         <div class="col-lg-6">
             {% for repositorio in repositorios %}
-            <h5 class="card-title">{{ repositorio.name }}</h5>
-            <h6 class="card-text">Criador: {{ repositorio.owner }} </h6>
-            <h6 class="card-text">Linguagems Utilizadas: {{ repositorio.languages }} </h6>
-            <table class="table">
-                <tbody>
-                    <tr class="table-primary">
-                        <th scope="row">Número de commits</th>
-                        <td>{{ repositorio.commit_count }}</td>
-                    </tr>
-                    <tr class="table-secondary">
-                        <th scope="row">Número de linhas de código</th>
-                        <td>{{ repositorio.line_count }}</td>
-                    </tr>
-                    <tr class="table-success">
-                        <th scope="row">Número de issues resolvidas</th>
-                        <td>{{ repositorio.issues_count }}</td>
-                    </tr>
-                    <tr class="table-danger">
-                        <th scope="row">Número de pull requests aceitos</th>
-                        <td>{{ repositorio.pulls_count }}</td>
-                    </tr>
-                    <tr class="table-warning">
-                        <th scope="row">Número de estrelas</th>
-                        <td>{{ repositorio.stars }}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="buttons">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ repositorio.name }}</h5>
+                    <h6 class="card-text">Criador: {{ repositorio.owner }}</h6>
+                    <h6 class="card-text">Linguagens Utilizadas: {{ repositorio.languages }}</h6>
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr class="table-primary">
+                                <th scope="row">Número de commits</th>
+                                <td>{{ repositorio.commit_count }}</td>
+                            </tr>
+                            <tr class="table-secondary">
+                                <th scope="row">Número de linhas de código</th>
+                                <td>{{ repositorio.line_count }}</td>
+                            </tr>
+                            <tr class="table-success">
+                                <th scope="row">Número de issues resolvidas</th>
+                                <td>{{ repositorio.issues_count }}</td>
+                            </tr>
+                            <tr class="table-danger">
+                                <th scope="row">Número de pull requests aceitos</th>
+                                <td>{{ repositorio.pulls_count }}</td>
+                            </tr>
+                            <tr class="table-warning">
+                                <th scope="row">Número de estrelas</th>
+                                <td>{{ repositorio.stars }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="buttons">
+                        <div class="btn-group" role="group" aria-label="Botões de ação">
+                            <form method="post" action="{% url 'add_or_update_repositorio' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="repositorio_url" value="{{ repositorio.url }}">
+                                <input type="hidden" name="form_type" value="update">                                   <button type="submit" class="btn btn-primary btn-sm">Atualizar</button>
+                            </form>
+                            <form method="post" action="{% url 'deletar_repositorio' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="repositorio_id" value="{{ repositorio.repository_id }}">
+                                <button type="submit" class="btn btn-danger btn-sm ms-1">Remover</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
             {% endfor %}
         </div>
         <div class="col-lg-6">
+            <!-- Conteúdo da segunda coluna, se houver -->
         </div>
     </div>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
 {% endblock %}

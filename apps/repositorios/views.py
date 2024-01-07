@@ -10,37 +10,83 @@ def index(request):
     return render(request, "repositorios/index.html")
 
 
-def cadastrar_repositorio(request):
-    if request.method == "POST":
-        repositorio_id = request.POST.get("repositorio_id")
-        repositorio_nome = request.POST.get("repositorio_nome")
-        repositorio_criador = request.POST.get("repositorio_criador")
-        repositorio_stars = request.POST.get("repositorio_stars")
-        repositorio_url = request.POST.get("repositorio_url")
-        commits_count = get_commit_count(request, f"{repositorio_url}/commits")
-        line_count, languages = get_line_count(
-            request, f"{repositorio_url}/languages"
-        )
-        issues_count = get_issues_count(
-            request, f"{repositorio_url}/issues?state=closed"
-        )
-        pulls_count = get_pulls_count(
-            request, f"{repositorio_url}/pulls?state=closed"
-        )
+def deletar_repositorio(request):
+    repositorio_id = request.POST.get("repositorio_id")
+    repositorio = Repositorio.objects.get(repository_id=repositorio_id)
+    repositorio.delete()
+    messages.success(request, "Repositório deletado com sucesso!")
+    return redirect("repositorios")
 
+
+def get_dates_by_api_request(request, repositorio_url):
+    commits_count = get_commit_count(request, f"{repositorio_url}/commits")
+    line_count, languages = get_line_count(
+        request, f"{repositorio_url}/languages"
+    )
+    issues_count = get_issues_count(
+        request, f"{repositorio_url}/issues?state=closed"
+    )
+    pulls_count = get_pulls_count(
+        request, f"{repositorio_url}/pulls?state=closed"
+    )
+
+    return commits_count, line_count, languages, issues_count, pulls_count
+
+
+def add_or_update_repositorio(request):
+    repositorio_url = request.POST.get("repositorio_url")
+    form_type = request.POST.get("form_type")
+
+    repositorio = get_repositorio_by_api(request, repositorio_url)
+    (
+        commits_count,
+        line_count,
+        languages,
+        issues_count,
+        pulls_count,
+    ) = get_dates_by_api_request(request, repositorio_url)
+
+    if form_type == "add":
         Repositorio.objects.create(
-            repository_id=repositorio_id,
-            name=repositorio_nome,
-            owner=repositorio_criador,
+            repository_id=repositorio.repository_id,
+            url=repositorio.url,
+            name=repositorio.name,
+            owner=repositorio.owner,
+            stars=repositorio.stars,
             languages=languages,
-            stars=repositorio_stars,
             commit_count=commits_count,
             line_count=line_count,
             issues_count=issues_count,
             pulls_count=pulls_count,
         )
         messages.success(request, "Repositório cadastrado com sucesso!")
+    else:
+        Repositorio.objects.filter(
+            repository_id=repositorio.repository_id
+        ).update(
+            stars=repositorio.stars,
+            languages=languages,
+            commit_count=commits_count,
+            line_count=line_count,
+            issues_count=issues_count,
+            pulls_count=pulls_count,
+        )
+        messages.success(request, "Repositório atualizado com sucesso!")
     return redirect("repositorios")
+
+
+def get_repositorio_by_api(request, repositorio_url):
+    response = requests.get(
+        f"{repositorio_url}",
+        headers={"Authorization": f"Bearer {request.user.access_token}"},
+    )
+    if response.status_code == 200:
+        repositorio_json = response.json()
+        repositorio = process_git_repository(repositorio_json)
+        return repositorio
+    else:
+        messages.error(request, "Repositório não encontrado!")
+        return redirect("repositorios")
 
 
 def list_repositorio(request):
@@ -92,35 +138,6 @@ def process_git_repository(repo):
         git_repositorio.is_registred = False
 
     return git_repositorio
-
-
-def process_repository(request, repo):
-    commits_url = repo["commits_url"].replace("{/sha}", "")
-    languages_url = repo["languages_url"]
-    issues_url = repo["issues_url"].replace("{/number}", "")
-    pulls_url = repo["pulls_url"].replace("{/number}", "")
-
-    commit_count = get_commit_count(request, commits_url)
-    line_count, languages = get_line_count(request, languages_url)
-    closed_issues = get_closed_issues_count(request, issues_url)
-    pulls_count = get_pulls_count(request, pulls_url)
-
-    repositorio = Repositorio(
-        nome=repo["name"],
-        project_id=repo["id"],
-        criador=repo["owner"]["login"],
-        project_url=repo["html_url"],
-        linguagens=languages,
-        commits_url=commits_url,
-        pulls_url=pulls_url,
-        languages_url=languages_url,
-        commit_count=commit_count,
-        line_count=line_count,
-        closed_issues_count=closed_issues,
-        pulls_count=pulls_count,
-        estrelas=repo["stargazers_count"],
-    )
-    return repositorio
 
 
 def get_commit_count(request, commits_url):

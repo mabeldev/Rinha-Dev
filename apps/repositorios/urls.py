@@ -10,5 +10,14 @@ urlpatterns = [
         name="git_repositorios",
     ),
     path("repositorios", views.list_repositorio, name="repositorios"),
-    path("cadastrar_repositorio", views.cadastrar_repositorio, name="cadastrar_repositorio"),
+    path(
+        "add_or_update_repositorio",
+        views.add_or_update_repositorio,
+        name="add_or_update_repositorio",
+    ),
+    path(
+        "deletar_repositorio",
+        views.deletar_repositorio,
+        name="deletar_repositorio",
+    ),
 ]
