@@ -89,8 +89,23 @@ def get_repositorio_by_api(request, repositorio_url):
         return redirect("repositorios")
 
 
+def list_all_repositorios(request):
+    repositorios_git = list_git_repositorio(request)
+    repositoios_db = list_repositorio(request)
+    return render(
+        request,
+        "repositorios/repositorios.html",
+        {
+            "repositorios_git": repositorios_git,
+            "repositorios_db": repositoios_db,
+        },
+    )
+
+
 def list_repositorio(request):
     repositorios = Repositorio.objects.filter(owner=request.user)
+
+    return repositorios
     return render(
         request,
         "repositorios/repositorios.html",
@@ -111,6 +126,7 @@ def list_git_repositorio(request):
             repositorio = process_git_repository(repo)
             repositorios.append(repositorio)
 
+        return repositorios
         return render(
             request,
             "repositorios/git_repositorios.html",

@@ -6,8 +6,7 @@
             <h1>Bem-vindo ao Rinha Dev</h1>
             <p>Descrição do projeto...</p>
             {% if user.is_authenticated %}
-            <a class="btn btn-success btn-lg" href="{% url 'repositorios' %}" role="button">Meus Repositorios No Ranking</a>
-            <a class="btn btn-primary btn-lg" href="{% url 'git_repositorios' %}" role="button">Meus Repositorios No GitHub</a>
+            <a class="btn btn-success btn-lg" href="{% url 'repositorios' %}" role="button">Meus Repositorios</a>
             {% else %}
             <a class="btn btn-success btn-lg" href="{% url 'login' %}" role="button">Login com GitHub</a>
             {% endif %}

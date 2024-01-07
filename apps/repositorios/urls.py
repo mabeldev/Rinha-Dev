@@ -4,12 +4,7 @@ from apps.repositorios import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path(
-        "git_repositorios",
-        views.list_git_repositorio,
-        name="git_repositorios",
-    ),
-    path("repositorios", views.list_repositorio, name="repositorios"),
+    path("repositorios", views.list_all_repositorios, name="repositorios"),
     path(
         "add_or_update_repositorio",
         views.add_or_update_repositorio,
