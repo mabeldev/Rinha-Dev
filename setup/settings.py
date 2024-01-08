@@ -19,13 +19,20 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# GITHUB PATHS
-GITHUB_OAUTH_URL = str(os.getenv("GITHUB_OAUTH_URL"))
+# GITHUB SECRETS
 GITHUB_CLIENT_ID = str(os.getenv("GITHUB_CLIENT_ID"))
-GITHUB_REDIRECT_URI = str(os.getenv("GITHUB_REDIRECT_URI"))
 GITHUB_CLIENT_SECRET = str(os.getenv("GITHUB_CLIENT_SECRET"))
+
+# GITHUB PATHS
+GITHUB_GET_REPOSITORIES = "https://api.github.com/user/repos"
+GITHUB_GET_REPOSITORY = "https://api.github.com/repos/{owner}/{name}"
+GITHUB_OAUTH_URL = "https://github.com/login/oauth/"
+GITHUB_REDIRECT_URI = "http://localhost:8000/callback"
+
+# GITHUB CONCAT PATHS
 GITHUB_GET_USER_CODE = f"{GITHUB_OAUTH_URL}authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}&scope=user"
 GITHUB_ACCESS_TOKEN_URL = f"{GITHUB_OAUTH_URL}access_token"
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/

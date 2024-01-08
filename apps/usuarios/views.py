@@ -26,9 +26,8 @@ def callback_view(request):
     access_token = get_user_token(request)
 
     if not access_token:
-        return messages.error(
-            request, "Erro ao tentar realizar login com o Github"
-        )
+        messages.error(request, "Erro ao tentar realizar login com o Github")
+        return redirect("index")
 
     user_data = get_user_data_json(access_token)
     usuario = add_or_update_user(user_data, access_token)
@@ -86,6 +85,7 @@ def add_or_update_user(user_data, access_token):
             email=email,
             access_token=access_token,
         )
+        usuario.save()
     return usuario
 
 
