@@ -1,5 +1,6 @@
 import requests
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import redirect, render
 
@@ -109,17 +110,30 @@ def get_repositorio_by_api(request, repositorio_url):
 
 @check_authentication
 def list_all_repositorios(request):
-    repositorios_git = list_git_repositorio(request)
-    repositoios_db = list_repositorio(request)
+    repositorios_git = list(list_git_repositorio(request))
+    repositoios_db = list(list_repositorio(request))
 
     if not repositorios_git and not repositoios_db:
         messages.info(request, "Você ainda não possui nenhum repositório.")
+
+    # Configuração da paginação
+    paginator_git = Paginator(
+        repositorios_git, 5
+    )  # 10 itens por página para repositorios_git
+    paginator_db = Paginator(repositoios_db, 5)
+
+    page_git = request.GET.get("page_git")
+    page_db = request.GET.get("page_db")
+
+    repositorios_paginated_git = paginator_git.get_page(page_git)
+    repositorios_paginated_db = paginator_db.get_page(page_db)
+
     return render(
         request,
         "repositorios/repositorios.html",
         {
-            "repositorios_git": repositorios_git,
-            "repositorios_db": repositoios_db,
+            "repositorios_git": repositorios_paginated_git,
+            "repositorios_db": repositorios_paginated_db,
         },
     )
 

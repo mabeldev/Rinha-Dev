@@ -8,9 +8,9 @@
                 <div class="card-body">
                     {% if repositorio.is_registred %}
                     <h5 class="card-title">{{ repositorio.name }} ✅</h5>
+                    <h6 class="card-text">Criador: {{ repositorio.owner }}</h6>
                     {% else %}
                     <h5 class="card-title">{{ repositorio.name }} ❌</h5>
-                    {% endif %}
                     <h6 class="card-text">Criador: {{ repositorio.owner }}</h6>
                     <p class="card-text">Descrição: {{ repositorio.description }}</p>
                     <div class="buttons">
@@ -37,9 +37,35 @@
                         </form>
                         {% endif %}
                     </div>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-left">
+                    {% if repositorios_git.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page_git={{ repositorios_git.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+            
+                    {% for num in repositorios_git.paginator.page_range %}
+                        <li class="page-item {% if num == repositorios_git.number %}active{% endif %}">
+                            <a class="page-link" href="?page_git={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+            
+                    {% if repositorios_git.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page_git={{ repositorios_git.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
         <div class="col-lg-6">
             {% for repositorio in repositorios_db %}
@@ -94,6 +120,31 @@
                 </div>
             </div>
             {% endfor %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-left">
+                    {% if repositorios_db.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page_db={{ repositorios_db.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+            
+                    {% for num in repositorios_db.paginator.page_range %}
+                        <li class="page-item {% if num == repositorios_db.number %}active{% endif %}">
+                            <a class="page-link" href="?page_db={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endfor %}
+            
+                    {% if repositorios_db.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page_db={{ repositorios_db.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
         </div>
     </div>
 </main>

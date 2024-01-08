@@ -107,6 +107,7 @@ def authorize_user(request, usuario):
 def get_users_ranking(request):
     users = CustomUser.objects.all()
     pontuacoes_list = []
+
     for user in users:
         pontuacao = 0
         repositorios = Repositorio.objects.filter(added_by=user.username)
@@ -116,6 +117,7 @@ def get_users_ranking(request):
 
         pontuacoes_list.append(
             {
+                "posicao": 0,
                 "username": user.username,
                 "repo_count": repositorios.count,
                 "pontuacao": pontuacao,
@@ -125,7 +127,10 @@ def get_users_ranking(request):
         pontuacoes_list, key=lambda x: x["pontuacao"], reverse=True
     )
 
-    paginator = Paginator(pontuacoes_list, 1)
+    for user in pontuacoes_list:
+        user["posicao"] = pontuacoes_list.index(user) + 1
+
+    paginator = Paginator(pontuacoes_list, 10)
     try:
         page = int(request.GET.get("page", "1"))
     except ValueError:

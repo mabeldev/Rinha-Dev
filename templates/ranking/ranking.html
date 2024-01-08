@@ -14,7 +14,7 @@
         <tbody>
             {% for rank in pontuacoes%}
             <tr>
-                <td>{{ forloop.counter }}</td>
+                <td>{{rank.posicao}}</td>
                 <td>{{rank.username}}</td>
                 <td>{{rank.repo_count}}</td>
                 <td>{{rank.pontuacao}}</td>
