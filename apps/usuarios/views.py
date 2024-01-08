@@ -30,6 +30,11 @@ def callback_view(request):
         return redirect("index")
 
     user_data = get_user_data_json(access_token)
+
+    if not user_data:
+        messages.error(request, "Erro ao tentar realizar login com o Github")
+        return redirect("index")
+
     usuario = add_or_update_user(user_data, access_token)
     authorize_user(request, usuario)
     return redirect("index")
