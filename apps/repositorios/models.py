@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Repositorio(models.Model):
-    repository_id = models.IntegerField(unique=True)
+    repository_id = models.IntegerField()
     url = models.URLField(max_length=255)
     name = models.CharField(max_length=255)
     owner = models.CharField(max_length=255)

@@ -1,7 +1,9 @@
 import requests
 from django.contrib import auth, messages
+from django.db.models import Q
 from django.shortcuts import redirect
 
+from apps.repositorios.models import Repositorio
 from apps.usuarios.models import CustomUser
 from setup.settings import (
     GITHUB_ACCESS_TOKEN_URL,
@@ -100,3 +102,17 @@ def authorize_user(request, usuario):
         messages.success(request, "Login realizado com sucesso")
     except auth.AuthenticationFailed:
         messages.error(request, "Erro ao tentar realizar login")
+
+
+# def get_users_ranking(request):
+#     users = CustomUser.objects.all()
+#     for user in users:
+#         repositorios = Repositorio.objects.filter(
+#             Q(owner=user.username) | Q(added_by=user.username)
+#         )
+
+#         pontuacao = 0
+#         for repositorio in repositorios:
+
+
+#     return render(request, "usuarios/ranking.html", {"users": users})

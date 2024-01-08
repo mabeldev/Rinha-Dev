@@ -80,9 +80,9 @@
                                 <input type="hidden" name="repositorio_url" value="{{ repositorio.url }}">
                                 <input type="hidden" name="form_type" value="update">                                   <button type="submit" class="btn btn-primary btn-sm">Atualizar</button>
                             </form>
-                            <form method="post" action="{% url 'deletar_repositorio' %}">
+                            <form method="post" action="{% url 'deletar_repositorio'%}">
                                 {% csrf_token %}
-                                <input type="hidden" name="repositorio_id" value="{{ repositorio.repository_id }}">
+                                <input type="hidden" name="repositorio_id" value="{{ repositorio.id }}">
                                 <button type="submit" class="btn btn-danger btn-sm ms-1">Remover</button>
                             </form>
                         </div>

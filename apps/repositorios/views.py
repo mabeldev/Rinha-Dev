@@ -12,9 +12,10 @@ def index(request):
     return render(request, "repositorios/index.html")
 
 
+@check_authentication
 def deletar_repositorio(request):
     repositorio_id = request.POST.get("repositorio_id")
-    repositorio = Repositorio.objects.get(repository_id=repositorio_id)
+    repositorio = Repositorio.objects.get(id=repositorio_id)
     repositorio.delete()
     messages.success(request, "Repositório deletado com sucesso!")
     return redirect("repositorios")
@@ -85,7 +86,7 @@ def get_repositorio_by_api(request, repositorio_url):
     )
     if response.status_code == 200:
         repositorio_json = response.json()
-        repositorio = process_git_repository(repositorio_json)
+        repositorio = process_git_repository(request, repositorio_json)
         return repositorio
     else:
         messages.error(request, "Repositório não encontrado!")
@@ -124,7 +125,7 @@ def list_git_repositorio(request):
         repositorios = []
 
         for repo in repositorios_json:
-            repositorio = process_git_repository(repo)
+            repositorio = process_git_repository(request, repo)
             repositorios.append(repositorio)
 
         return repositorios
@@ -133,7 +134,7 @@ def list_git_repositorio(request):
         return redirect("index")
 
 
-def process_git_repository(repo):
+def process_git_repository(request, repo):
     git_repositorio = GitRepositorio(
         repository_id=repo["id"],
         name=repo["name"],
@@ -143,7 +144,8 @@ def process_git_repository(repo):
         stars=repo["stargazers_count"],
     )
     if Repositorio.objects.filter(
-        repository_id=git_repositorio.repository_id
+        Q(repository_id=git_repositorio.repository_id)
+        & Q(added_by=request.user)
     ).exists():
         git_repositorio.is_registred = True
     else:
