@@ -1,5 +1,6 @@
 import requests
 from django.contrib import messages
+from django.db.models import Q
 from django.shortcuts import redirect, render
 
 from apps.repositorios.models import GitRepositorio, Repositorio
@@ -44,6 +45,7 @@ def add_or_update_repositorio(request):
             line_count=line_count,
             issues_count=issues_count,
             pulls_count=pulls_count,
+            added_by=request.user,
         )
         messages.success(request, "Repositório cadastrado com sucesso!")
     else:
@@ -105,7 +107,9 @@ def list_all_repositorios(request):
 
 
 def list_repositorio(request):
-    repositorios = Repositorio.objects.filter(owner=request.user)
+    repositorios = Repositorio.objects.filter(
+        Q(owner=request.user) | Q(added_by=request.user)
+    )
 
     return repositorios
 

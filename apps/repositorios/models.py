@@ -6,6 +6,7 @@ class Repositorio(models.Model):
     url = models.URLField(max_length=255)
     name = models.CharField(max_length=255)
     owner = models.CharField(max_length=255)
+    added_by = models.CharField(max_length=255)
     stars = models.IntegerField()
     languages = models.CharField(max_length=255)
     commit_count = models.IntegerField()
