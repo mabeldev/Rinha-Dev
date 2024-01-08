@@ -5,7 +5,13 @@ from django.shortcuts import redirect, render
 
 from apps.repositorios.models import GitRepositorio, Repositorio
 from apps.utils.auth_utils import check_authentication
-from setup.settings import GITHUB_GET_REPOSITORIES
+from setup.settings import (
+    COMMIT_MULTIPLIER,
+    GITHUB_GET_REPOSITORIES,
+    ISSUES_MULTIPLIER,
+    LINES_MULTIPLIER,
+    PULLS_MULTIPLIER,
+)
 
 
 def index(request):
@@ -34,19 +40,26 @@ def add_or_update_repositorio(request):
         pulls_count,
     ) = get_dates_by_api_request(request, repositorio_url)
 
+    pontuacao = 0
+    pontuacao += commits_count * float(COMMIT_MULTIPLIER)
+    pontuacao += line_count * float(LINES_MULTIPLIER)
+    pontuacao += issues_count * float(ISSUES_MULTIPLIER)
+    pontuacao += pulls_count * float(PULLS_MULTIPLIER)
+
     if form_type == "add":
         Repositorio.objects.create(
             repository_id=repositorio.repository_id,
             url=repositorio.url,
             name=repositorio.name,
             owner=repositorio.owner,
+            added_by=request.user,
             stars=repositorio.stars,
             languages=languages,
             commit_count=commits_count,
             line_count=line_count,
             issues_count=issues_count,
             pulls_count=pulls_count,
-            added_by=request.user,
+            pontuacao=pontuacao,
         )
         messages.success(request, "Repositório cadastrado com sucesso!")
     else:
@@ -59,6 +72,7 @@ def add_or_update_repositorio(request):
             line_count=line_count,
             issues_count=issues_count,
             pulls_count=pulls_count,
+            pontuacao=pontuacao,
         )
         messages.success(request, "Repositório atualizado com sucesso!")
     return redirect("repositorios")
@@ -97,6 +111,9 @@ def get_repositorio_by_api(request, repositorio_url):
 def list_all_repositorios(request):
     repositorios_git = list_git_repositorio(request)
     repositoios_db = list_repositorio(request)
+
+    if not repositorios_git and not repositoios_db:
+        messages.info(request, "Você ainda não possui nenhum repositório.")
     return render(
         request,
         "repositorios/repositorios.html",
@@ -127,11 +144,12 @@ def list_git_repositorio(request):
         for repo in repositorios_json:
             repositorio = process_git_repository(request, repo)
             repositorios.append(repositorio)
-
+        if not repositorios:
+            return None
         return repositorios
     else:
         messages.error = f"Erro ao buscar repositórios: {response.status_code}"
-        return redirect("index")
+        return None
 
 
 def process_git_repository(request, repo):

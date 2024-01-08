@@ -13,6 +13,7 @@ class Repositorio(models.Model):
     line_count = models.IntegerField()
     issues_count = models.IntegerField()
     pulls_count = models.IntegerField()
+    pontuacao = models.FloatField()
 
 
 class GitRepositorio:

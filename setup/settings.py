@@ -34,6 +34,11 @@ GITHUB_REDIRECT_URI = "http://localhost:8000/callback"
 GITHUB_GET_USER_CODE = f"{GITHUB_OAUTH_URL}authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}&scope=user"
 GITHUB_ACCESS_TOKEN_URL = f"{GITHUB_OAUTH_URL}access_token"
 
+COMMIT_MULTIPLIER = os.getenv("COMMIT_MULTIPLIER")
+LINES_MULTIPLIER = os.getenv("LINES_MULTIPLIER")
+ISSUES_MULTIPLIER = os.getenv("ISSUES_MULTIPLIER")
+PULLS_MULTIPLIER = os.getenv("PULLS_MULTIPLIER")
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -147,4 +152,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "usuarios.CustomUser"
 
 # MESSAGES
-MESSAGE_TAGS = {messages.ERROR: "danger", messages.SUCCESS: "success"}
+MESSAGE_TAGS = {
+    messages.ERROR: "danger",
+    messages.SUCCESS: "success",
+    messages.INFO: "warning",
+}
