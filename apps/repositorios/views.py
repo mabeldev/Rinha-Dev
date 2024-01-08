@@ -18,21 +18,6 @@ def deletar_repositorio(request):
     return redirect("repositorios")
 
 
-def get_dates_by_api_request(request, repositorio_url):
-    commits_count = get_commit_count(request, f"{repositorio_url}/commits")
-    line_count, languages = get_line_count(
-        request, f"{repositorio_url}/languages"
-    )
-    issues_count = get_issues_count(
-        request, f"{repositorio_url}/issues?state=closed"
-    )
-    pulls_count = get_pulls_count(
-        request, f"{repositorio_url}/pulls?state=closed"
-    )
-
-    return commits_count, line_count, languages, issues_count, pulls_count
-
-
 def add_or_update_repositorio(request):
     repositorio_url = request.POST.get("repositorio_url")
     form_type = request.POST.get("form_type")
@@ -73,6 +58,21 @@ def add_or_update_repositorio(request):
         )
         messages.success(request, "Repositório atualizado com sucesso!")
     return redirect("repositorios")
+
+
+def get_dates_by_api_request(request, repositorio_url):
+    commits_count = get_commit_count(request, f"{repositorio_url}/commits")
+    line_count, languages = get_line_count(
+        request, f"{repositorio_url}/languages"
+    )
+    issues_count = get_issues_count(
+        request, f"{repositorio_url}/issues?state=closed"
+    )
+    pulls_count = get_pulls_count(
+        request, f"{repositorio_url}/pulls?state=closed"
+    )
+
+    return commits_count, line_count, languages, issues_count, pulls_count
 
 
 def get_repositorio_by_api(request, repositorio_url):

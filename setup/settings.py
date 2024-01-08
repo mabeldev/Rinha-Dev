@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path, os
 
+from django.contrib.messages import constants as messages
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -144,3 +145,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom Auth user
 AUTH_USER_MODEL = "usuarios.CustomUser"
+
+# MESSAGES
+MESSAGE_TAGS = {messages.ERROR: "danger", messages.SUCCESS: "success"}
