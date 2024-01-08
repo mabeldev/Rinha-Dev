@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 
 from apps.repositorios.models import GitRepositorio, Repositorio
+from apps.utils.auth_utils import check_authentication
 from setup.settings import GITHUB_GET_REPOSITORIES
 
 
@@ -89,6 +90,7 @@ def get_repositorio_by_api(request, repositorio_url):
         return redirect("repositorios")
 
 
+@check_authentication
 def list_all_repositorios(request):
     repositorios_git = list_git_repositorio(request)
     repositoios_db = list_repositorio(request)
