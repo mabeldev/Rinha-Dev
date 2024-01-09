@@ -1,7 +1,6 @@
 import requests
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q
 from django.shortcuts import redirect, render
 
 from apps.utils.auth_utils import check_authentication
@@ -24,10 +23,10 @@ def index(request):
 def delete_repository(request, repo_id):
     Repositorio.objects.get(id=repo_id).delete()
     messages.info(request, "Repositório deletado com sucesso!")
-    return redirect("repositorios")
+    return redirect("repositories")
 
 
-def add_or_update_repository(request):
+def sync_repository(request):
     url = request.POST.get("repositorio_url")
     form_type = request.POST.get("form_type")
 
@@ -41,9 +40,10 @@ def add_or_update_repository(request):
     else:
         update_repository(request, repo, stats, score)
 
-    return redirect("repositorios")
+    return redirect("repositories")
 
 
+@check_authentication
 def list_repositories(request):
     git_repos = list_git_repositories(request)
 
@@ -72,12 +72,10 @@ def list_repositories(request):
 
 
 def list_database_repositories(request):
-    return Repositorio.objects.filter(
-        Q(owner=request.user) | Q(added_by=request.user)
-    )
+    return request.user.repositorio_set.all()
 
 
-@check_authentication
+
 def list_git_repositories(request):
     response = requests.get(
         GITHUB_GET_REPOSITORIES,
@@ -98,7 +96,7 @@ def get_repository_from_api(request, url):
         return process_git_repo(request, response.json())
 
     messages.error("Repositório não encontrado!")
-    return redirect("repositorios")
+    return redirect("repositories")
 
 
 def get_stats_from_api(request, url):

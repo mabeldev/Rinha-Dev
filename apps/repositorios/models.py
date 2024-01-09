@@ -6,7 +6,9 @@ class Repositorio(models.Model):
     url = models.URLField(max_length=255)
     name = models.CharField(max_length=255)
     owner = models.CharField(max_length=255)
-    added_by = models.CharField(max_length=255)
+    added_by = models.ForeignKey(
+        "usuarios.CustomUser", on_delete=models.CASCADE
+    )
     stars = models.IntegerField()
     languages = models.CharField(max_length=255)
     commit_count = models.IntegerField()
@@ -19,13 +21,13 @@ class Repositorio(models.Model):
 class GitRepositorio:
     def __init__(
         self,
-        repo_id,
-        name,
-        owner,
-        description,
-        stars,
-        url,
-        is_registered,
+        repo_id: int,
+        name: str,
+        owner: str,
+        description: str,
+        stars: int,
+        url: str,
+        is_registered: bool = False,
     ):
         self.repo_id = repo_id
         self.name = name

@@ -6,7 +6,7 @@
             <h1>Bem-vindo ao Rinha Dev</h1>
             <p>Descrição do projeto...</p>
             {% if user.is_authenticated %}
-            <a class="btn btn-success btn-lg" href="{% url 'repositorios' %}" role="button">Meus Repositorios</a>
+            <a class="btn btn-success btn-lg" href="{% url 'repositories' %}" role="button">Meus Repositorios</a>
             {% else %}
             <a class="btn btn-success btn-lg" href="{% url 'login' %}" role="button"><i class="bi bi-github"></i> Login</a>
             {% endif %}

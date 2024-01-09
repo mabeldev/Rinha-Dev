@@ -20,7 +20,7 @@
                     <h6 class="card-text">Criador: {{ repo.owner }}</h6>
                     <p class="card-text">Descrição: {{ repo.description }}</p>
                     <div class="buttons">
-                        <form method="post" action="{% url 'add_or_update_repositorio' %}">
+                        <form method="post" action="{% url 'sync_repository' %}">
                             {% csrf_token %}
                             <input type="hidden" name="repositorio_url" value="{{ repo.url }}">
                             <input type="hidden" name="form_type" value="add">
@@ -88,13 +88,13 @@
                     </div>
                     <div class="buttons">
                         <div class="btn-group" role="group" aria-label="Botões de ação">
-                            <form method="post" action="{% url 'add_or_update_repositorio' %}">
+                            <form method="post" action="{% url 'sync_repository' %}">
                                 {% csrf_token %}
                                 <input type="hidden" name="repositorio_url" value="{{ repo.url }}">
                                 <input type="hidden" name="form_type" value="update"> <button type="submit"
                                     class="btn btn-primary btn-sm">Atualizar</button>
                             </form>
-                            <a href="{% url 'deletar_repositorio' repo.id %}">
+                            <a href="{% url 'delete_repository' repo.id %}">
                                 <button class="btn btn-danger btn-sm ms-1">Deletar</button>
                             </a>
                         </div>

@@ -3,7 +3,6 @@ from django.contrib import auth, messages
 from django.core.paginator import EmptyPage, InvalidPage, Paginator
 from django.shortcuts import redirect, render
 
-from apps.repositorios.models import Repositorio
 from apps.usuarios.models import CustomUser
 from setup.settings import (
     GITHUB_ACCESS_TOKEN_URL,
@@ -24,84 +23,69 @@ def logout(request):
     return redirect("index")
 
 
-def callback_view(request):
-    access_token = get_user_token(request)
-
-    if not access_token:
-        messages.error(request, "Erro ao tentar realizar login com o Github")
+def callback(request):
+    token = get_access_token(request)
+    if not token:
+        messages.error(request, "Erro ao obter token do GitHub")
         return redirect("index")
 
-    user_data = get_user_data_json(access_token)
-
+    user_data = get_user_data(token)
     if not user_data:
-        messages.error(request, "Erro ao tentar realizar login com o Github")
+        messages.error(request, "Erro ao obter dados do usuário")
         return redirect("index")
 
-    usuario = add_or_update_user(user_data, access_token)
-    authorize_user(request, usuario)
+    user = add_or_update_user(user_data, token)
+    authorize_user(request, user)
     return redirect("index")
 
 
-def get_user_data_json(access_token):
-    headers = {
-        "Authorization": f"token {access_token}",
-        "Accept": "application/json",
-    }
-    user_data = requests.get("https://api.github.com/user", headers=headers)
-
-    if user_data.status_code == 200:
-        return user_data.json()
-    else:
-        return None
-
-
-def get_user_token(request):
+def get_access_token(request):
     code = request.GET.get("code")
-
-    payload = {
-        "client_id": GITHUB_CLIENT_ID,
-        "client_secret": GITHUB_CLIENT_SECRET,
-        "code": code,
-        "redirect_uri": GITHUB_REDIRECT_URI,
-    }
-
     response = requests.post(
         GITHUB_ACCESS_TOKEN_URL,
-        data=payload,
+        data={
+            "client_id": GITHUB_CLIENT_ID,
+            "client_secret": GITHUB_CLIENT_SECRET,
+            "code": code,
+            "redirect_uri": GITHUB_REDIRECT_URI,
+        },
         headers={"Accept": "application/json"},
     )
-
     if response.status_code == 200:
-        access_token = str(response.json()["access_token"])
-        return access_token
-    else:
-        return None
+        return response.json()["access_token"]
+    return None
 
 
-def add_or_update_user(user_data, access_token):
+def get_user_data(token):
+    headers = {"Authorization": f"token {token}"}
+    response = requests.get("https://api.github.com/user", headers=headers)
+    if response.status_code == 200:
+        return response.json()
+    return None
+
+
+def add_or_update_user(user_data, token):
     username = user_data["login"]
     email = user_data["email"]
 
-    usuario = CustomUser.objects.filter(email=email).first()
-    if usuario:
-        usuario.access_token = access_token
-        usuario.save()
+    user = CustomUser.objects.filter(email=email).first()
+    if user:
+        user.token = token
+        user.save()
     else:
-        usuario = CustomUser.objects.create_user(
-            username=username,
-            email=email,
-            access_token=access_token,
+        user = CustomUser.objects.create_user(
+            username=username, email=email, token=token
         )
-        usuario.save()
-    return usuario
+        user.save()
+    return user
 
 
-def authorize_user(request, usuario):
+def authorize_user(request, user):
     try:
-        auth.login(request, usuario)
+        auth.login(request, user)
         messages.success(request, "Login realizado com sucesso")
     except auth.AuthenticationFailed:
-        messages.error(request, "Erro ao tentar realizar login")
+        messages.error(request, "Erro ao realizar login")
 
 
 def get_users_ranking(request):
@@ -109,24 +93,17 @@ def get_users_ranking(request):
     score_list = []
 
     for user in users:
-        score = 0
-        repositorios = Repositorio.objects.filter(added_by=user.username)
-
-        for repositorio in repositorios:
-            score += repositorio.score
-
+        score = calculate_user_score(user)
         score_list.append(
             {
                 "ranking": 0,
                 "username": user.username,
-                "repo_count": repositorios.count,
+                "repo_count": user.repositorio_set.count(),
                 "score": score,
             }
         )
-    score_list.sort(key=lambda x: x["score"], reverse=True)
 
-    for user in score_list:
-        user["ranking"] = score_list.index(user) + 1
+    rank_users(score_list)
 
     paginator = Paginator(score_list, 10)
     try:
@@ -140,3 +117,16 @@ def get_users_ranking(request):
         scores = paginator.page(paginator.num_pages)
 
     return render(request, "ranking/ranking.html", {"scores": scores})
+
+
+def calculate_user_score(user):
+    score = 0
+    for repo in user.repositorio_set.all():
+        score += repo.score
+    return score
+
+
+def rank_users(score_list):
+    score_list.sort(key=lambda x: x["score"], reverse=True)
+    for i, item in enumerate(score_list):
+        item["ranking"] = i + 1
