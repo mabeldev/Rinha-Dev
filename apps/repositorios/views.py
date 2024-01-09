@@ -1,6 +1,6 @@
 import requests
 from django.contrib import messages
-from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage, InvalidPage, Paginator
 from django.db.models import Q
 from django.shortcuts import redirect, render
 
@@ -24,7 +24,7 @@ def deletar_repositorio(request):
     repositorio_id = request.POST.get("repositorio_id")
     repositorio = Repositorio.objects.get(id=repositorio_id)
     repositorio.delete()
-    messages.success(request, "Repositório deletado com sucesso!")
+    messages.info(request, "Repositório deletado com sucesso!")
     return redirect("repositorios")
 
 
@@ -111,22 +111,35 @@ def get_repositorio_by_api(request, repositorio_url):
 @check_authentication
 def list_all_repositorios(request):
     repositorios_git = list(list_git_repositorio(request))
+    repositorios_git.sort(key=lambda x: x.is_registred, reverse=True)
+
     repositoios_db = list(list_repositorio(request))
 
     if not repositorios_git and not repositoios_db:
         messages.info(request, "Você ainda não possui nenhum repositório.")
 
-    # Configuração da paginação
-    paginator_git = Paginator(
-        repositorios_git, 5
-    )  # 10 itens por página para repositorios_git
-    paginator_db = Paginator(repositoios_db, 5)
+    paginator_git = Paginator(repositorios_git, 8)
+    paginator_db = Paginator(repositoios_db, 8)
 
-    page_git = request.GET.get("page_git")
-    page_db = request.GET.get("page_db")
+    try:
+        page_git = request.GET.get("page_git")
+    except ValueError:
+        page_git = 1
 
-    repositorios_paginated_git = paginator_git.get_page(page_git)
-    repositorios_paginated_db = paginator_db.get_page(page_db)
+    try:
+        page_db = request.GET.get("page_db")
+    except ValueError:
+        page_db = 1
+
+    try:
+        repositorios_paginated_git = paginator_git.get_page(page_git)
+    except (EmptyPage, InvalidPage):
+        repositorios_paginated_git = paginator_git.page(1)
+
+    try:
+        repositorios_paginated_db = paginator_db.get_page(page_db)
+    except (EmptyPage, InvalidPage):
+        repositorios_paginated_db = paginator_db.page(1)
 
     return render(
         request,
