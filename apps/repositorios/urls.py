@@ -4,15 +4,15 @@ from apps.repositorios import views
 
 urlpatterns = [
     path("", views.index, name="index"),
-    path("repositorios", views.list_all_repositorios, name="repositorios"),
+    path("repositories", views.list_repositories, name="repositories"),
     path(
-        "add_or_update_repositorio",
-        views.add_or_update_repositorio,
-        name="add_or_update_repositorio",
+        "sync_repository",
+        views.sync_repository,
+        name="sync_repository",
     ),
     path(
-        "deletar_repositorio",
-        views.deletar_repositorio,
-        name="deletar_repositorio",
+        "delete_repository/<int:repo_id>",
+        views.delete_repository,
+        name="delete_repository",
     ),
 ]

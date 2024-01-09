@@ -1,4 +1,5 @@
 {% extends 'shared/base.html' %}
+{% load static %}
 {% block content %}
 <main class="container mt-5">
     <div class="row">
@@ -6,13 +7,13 @@
             <h1>Bem-vindo ao Rinha Dev</h1>
             <p>Descrição do projeto...</p>
             {% if user.is_authenticated %}
-            <a class="btn btn-success btn-lg" href="{% url 'repositorios' %}" role="button">Meus Repositorios</a>
+            <a class="btn btn-success btn-lg" href="{% url 'repositories' %}" role="button">Meus Repositorios</a>
             {% else %}
             <a class="btn btn-success btn-lg" href="{% url 'login' %}" role="button"><i class="bi bi-github"></i> Login</a>
             {% endif %}
         </div>
         <div class="col-lg-6">
-            <img src="https://via.placeholder.com/500x300" class="img-fluid" alt="Imagem CTA">
+            <img src="{% static 'assets/images/rinha-index-page.jpg' %}" class="img-fluid" alt="Imagem CTA">
         </div>
     </div>
 </main>

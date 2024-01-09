@@ -10,10 +10,6 @@ class RepositorioAdmin(admin.ModelAdmin):
         "owner",
         "added_by",
     )
-    list_editable = (
-        "owner",
-        "added_by",
-    )
 
 
 admin.site.register(Repositorio, RepositorioAdmin)
