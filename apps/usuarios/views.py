@@ -106,39 +106,37 @@ def authorize_user(request, usuario):
 
 def get_users_ranking(request):
     users = CustomUser.objects.all()
-    pontuacoes_list = []
+    score_list = []
 
     for user in users:
-        pontuacao = 0
+        score = 0
         repositorios = Repositorio.objects.filter(added_by=user.username)
 
         for repositorio in repositorios:
-            pontuacao += repositorio.pontuacao
+            score += repositorio.score
 
-        pontuacoes_list.append(
+        score_list.append(
             {
-                "posicao": 0,
+                "ranking": 0,
                 "username": user.username,
                 "repo_count": repositorios.count,
-                "pontuacao": pontuacao,
+                "score": score,
             }
         )
-    pontuacoes_list = sorted(
-        pontuacoes_list, key=lambda x: x["pontuacao"], reverse=True
-    )
+    score_list.sort(key=lambda x: x["score"], reverse=True)
 
-    for user in pontuacoes_list:
-        user["posicao"] = pontuacoes_list.index(user) + 1
+    for user in score_list:
+        user["ranking"] = score_list.index(user) + 1
 
-    paginator = Paginator(pontuacoes_list, 10)
+    paginator = Paginator(score_list, 10)
     try:
         page = int(request.GET.get("page", "1"))
     except ValueError:
         page = 1
 
     try:
-        pontuacoes = paginator.page(page)
+        scores = paginator.page(page)
     except (EmptyPage, InvalidPage):
-        pontuacoes = paginator.page(paginator.num_pages)
+        scores = paginator.page(paginator.num_pages)
 
-    return render(request, "ranking/ranking.html", {"pontuacoes": pontuacoes})
+    return render(request, "ranking/ranking.html", {"scores": scores})

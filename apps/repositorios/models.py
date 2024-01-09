@@ -13,15 +13,24 @@ class Repositorio(models.Model):
     line_count = models.IntegerField()
     issues_count = models.IntegerField()
     pulls_count = models.IntegerField()
-    pontuacao = models.FloatField()
+    score = models.IntegerField()
 
 
 class GitRepositorio:
-    def __init__(self, repository_id, name, owner, description, stars, url):
-        self.repository_id = repository_id
+    def __init__(
+        self,
+        repo_id,
+        name,
+        owner,
+        description,
+        stars,
+        url,
+        is_registered,
+    ):
+        self.repo_id = repo_id
         self.name = name
         self.owner = owner
         self.description = description
         self.stars = stars
         self.url = url
-        is_registred = False
+        self.is_registered = is_registered
