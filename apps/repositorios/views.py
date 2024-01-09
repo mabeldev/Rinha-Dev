@@ -1,22 +1,30 @@
 import requests
 from django.contrib import messages
+from django.core.paginator import EmptyPage, InvalidPage, Paginator
 from django.db.models import Q
 from django.shortcuts import redirect, render
 
 from apps.repositorios.models import GitRepositorio, Repositorio
 from apps.utils.auth_utils import check_authentication
-from setup.settings import GITHUB_GET_REPOSITORIES
+from setup.settings import (
+    COMMIT_MULTIPLIER,
+    GITHUB_GET_REPOSITORIES,
+    ISSUES_MULTIPLIER,
+    LINES_MULTIPLIER,
+    PULLS_MULTIPLIER,
+)
 
 
 def index(request):
     return render(request, "repositorios/index.html")
 
 
+@check_authentication
 def deletar_repositorio(request):
     repositorio_id = request.POST.get("repositorio_id")
-    repositorio = Repositorio.objects.get(repository_id=repositorio_id)
+    repositorio = Repositorio.objects.get(id=repositorio_id)
     repositorio.delete()
-    messages.success(request, "Repositório deletado com sucesso!")
+    messages.info(request, "Repositório deletado com sucesso!")
     return redirect("repositorios")
 
 
@@ -33,19 +41,26 @@ def add_or_update_repositorio(request):
         pulls_count,
     ) = get_dates_by_api_request(request, repositorio_url)
 
+    pontuacao = 0
+    pontuacao += commits_count * float(COMMIT_MULTIPLIER)
+    pontuacao += line_count * float(LINES_MULTIPLIER)
+    pontuacao += issues_count * float(ISSUES_MULTIPLIER)
+    pontuacao += pulls_count * float(PULLS_MULTIPLIER)
+
     if form_type == "add":
         Repositorio.objects.create(
             repository_id=repositorio.repository_id,
             url=repositorio.url,
             name=repositorio.name,
             owner=repositorio.owner,
+            added_by=request.user,
             stars=repositorio.stars,
             languages=languages,
             commit_count=commits_count,
             line_count=line_count,
             issues_count=issues_count,
             pulls_count=pulls_count,
-            added_by=request.user,
+            pontuacao=pontuacao,
         )
         messages.success(request, "Repositório cadastrado com sucesso!")
     else:
@@ -58,6 +73,7 @@ def add_or_update_repositorio(request):
             line_count=line_count,
             issues_count=issues_count,
             pulls_count=pulls_count,
+            pontuacao=pontuacao,
         )
         messages.success(request, "Repositório atualizado com sucesso!")
     return redirect("repositorios")
@@ -85,7 +101,7 @@ def get_repositorio_by_api(request, repositorio_url):
     )
     if response.status_code == 200:
         repositorio_json = response.json()
-        repositorio = process_git_repository(repositorio_json)
+        repositorio = process_git_repository(request, repositorio_json)
         return repositorio
     else:
         messages.error(request, "Repositório não encontrado!")
@@ -94,14 +110,43 @@ def get_repositorio_by_api(request, repositorio_url):
 
 @check_authentication
 def list_all_repositorios(request):
-    repositorios_git = list_git_repositorio(request)
-    repositoios_db = list_repositorio(request)
+    repositorios_git = list(list_git_repositorio(request))
+    repositorios_git.sort(key=lambda x: x.is_registred, reverse=True)
+
+    repositoios_db = list(list_repositorio(request))
+
+    if not repositorios_git and not repositoios_db:
+        messages.info(request, "Você ainda não possui nenhum repositório.")
+
+    paginator_git = Paginator(repositorios_git, 8)
+    paginator_db = Paginator(repositoios_db, 8)
+
+    try:
+        page_git = request.GET.get("page_git")
+    except ValueError:
+        page_git = 1
+
+    try:
+        page_db = request.GET.get("page_db")
+    except ValueError:
+        page_db = 1
+
+    try:
+        repositorios_paginated_git = paginator_git.get_page(page_git)
+    except (EmptyPage, InvalidPage):
+        repositorios_paginated_git = paginator_git.page(1)
+
+    try:
+        repositorios_paginated_db = paginator_db.get_page(page_db)
+    except (EmptyPage, InvalidPage):
+        repositorios_paginated_db = paginator_db.page(1)
+
     return render(
         request,
         "repositorios/repositorios.html",
         {
-            "repositorios_git": repositorios_git,
-            "repositorios_db": repositoios_db,
+            "repositorios_git": repositorios_paginated_git,
+            "repositorios_db": repositorios_paginated_db,
         },
     )
 
@@ -124,16 +169,17 @@ def list_git_repositorio(request):
         repositorios = []
 
         for repo in repositorios_json:
-            repositorio = process_git_repository(repo)
+            repositorio = process_git_repository(request, repo)
             repositorios.append(repositorio)
-
+        if not repositorios:
+            return None
         return repositorios
     else:
         messages.error = f"Erro ao buscar repositórios: {response.status_code}"
-        return redirect("index")
+        return None
 
 
-def process_git_repository(repo):
+def process_git_repository(request, repo):
     git_repositorio = GitRepositorio(
         repository_id=repo["id"],
         name=repo["name"],
@@ -143,7 +189,8 @@ def process_git_repository(repo):
         stars=repo["stargazers_count"],
     )
     if Repositorio.objects.filter(
-        repository_id=git_repositorio.repository_id
+        Q(repository_id=git_repositorio.repository_id)
+        & Q(added_by=request.user)
     ).exists():
         git_repositorio.is_registred = True
     else:

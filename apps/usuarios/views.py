@@ -1,7 +1,9 @@
 import requests
 from django.contrib import auth, messages
-from django.shortcuts import redirect
+from django.core.paginator import EmptyPage, InvalidPage, Paginator
+from django.shortcuts import redirect, render
 
+from apps.repositorios.models import Repositorio
 from apps.usuarios.models import CustomUser
 from setup.settings import (
     GITHUB_ACCESS_TOKEN_URL,
@@ -100,3 +102,43 @@ def authorize_user(request, usuario):
         messages.success(request, "Login realizado com sucesso")
     except auth.AuthenticationFailed:
         messages.error(request, "Erro ao tentar realizar login")
+
+
+def get_users_ranking(request):
+    users = CustomUser.objects.all()
+    pontuacoes_list = []
+
+    for user in users:
+        pontuacao = 0
+        repositorios = Repositorio.objects.filter(added_by=user.username)
+
+        for repositorio in repositorios:
+            pontuacao += repositorio.pontuacao
+
+        pontuacoes_list.append(
+            {
+                "posicao": 0,
+                "username": user.username,
+                "repo_count": repositorios.count,
+                "pontuacao": pontuacao,
+            }
+        )
+    pontuacoes_list = sorted(
+        pontuacoes_list, key=lambda x: x["pontuacao"], reverse=True
+    )
+
+    for user in pontuacoes_list:
+        user["posicao"] = pontuacoes_list.index(user) + 1
+
+    paginator = Paginator(pontuacoes_list, 10)
+    try:
+        page = int(request.GET.get("page", "1"))
+    except ValueError:
+        page = 1
+
+    try:
+        pontuacoes = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        pontuacoes = paginator.page(paginator.num_pages)
+
+    return render(request, "ranking/ranking.html", {"pontuacoes": pontuacoes})
