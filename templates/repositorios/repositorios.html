@@ -1,0 +1,112 @@
+{% extends 'shared/base.html' %}
+{% block content %}
+<main class="container mt-5">
+    <div class="row">
+        <div class="col-lg-6">
+            <h1 class="display-20">Repositórios <i class="bi bi-github"></i>GitHub</h1>
+            {% for repo in git_repos %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    {% if repo.is_registered %}
+                    <div class="d-flex">
+                        <h5 class="card-title flex-grow-1">{{ repo.name }}</h5>
+                        <h5>✅</h5>
+                    </div>
+                    <h6 class="card-text">Criador: {{ repo.owner }}</h6>
+                    {% else %}
+                    <div class="d-flex">
+                        <h5 class="card-title flex-grow-1">{{ repo.name }}</h5>
+                        <h5>❌</h5>
+                    </div>
+                    <h6 class="card-text">Criador: {{ repo.owner }}</h6>
+                    <p class="card-text">Descrição: {{ repo.description }}</p>
+                    <div class="buttons">
+                        <form method="post" action="{% url 'sync_repository' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="repositorio_url" value="{{ repo.url }}">
+                            <input type="hidden" name="form_type" value="add">
+                            <button type="submit" class="btn btn-success btn-sm">Adicionar</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% include 'shared/pagination.html' with page_data=git_repos page_name='git_page' %}
+        </div>
+        <div class="col-lg-6">
+            <h1 class="display-20">Repositórios <i class="bi bi-archive">Salvos</i> </h1>
+            {% for repo in db_repos %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex">
+                        <h5 class="flex-grow-1">{{ repo.name }}</h5>
+                        <div class="">
+                            <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#additional-details-{{ repo.id }}" aria-expanded="false"
+                                aria-controls="additional-details-{{ repo.id }}">
+                                ︾
+                            </button>
+                        </div>
+                    </div>
+                    <h6 class="card-text">Criador: {{ repo.owner }}</h6>
+                    <h6 class="card-text">Adicionado por: {{ repo.added_by }}</h6>
+                    <h6 class="card-text">Linguagens Utilizadas: {{ repo.languages }}</h6>
+                    <div class="collapse" id="additional-details-{{ repo.id }}">
+                        <table class="table table-striped table-bordered">
+                            <thead class="table-secondary">
+                                <tr>
+                                    <th>Categoria</th>
+                                    <th>Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Número de commits</td>
+                                    <td>{{ repo.commit_count }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Número de linhas de código</td>
+                                    <td>{{ repo.line_count }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Número de issues resolvidas</td>
+                                    <td>{{ repo.issues_count }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Número de pull requests aceitos</td>
+                                    <td>{{ repo.pulls_count }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Número de estrelas</td>
+                                    <td>{{ repo.stars }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Pontuação</td>
+                                    <td>{{ repo.score }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="buttons">
+                        <div class="btn-group" role="group" aria-label="Botões de ação">
+                            <form method="post" action="{% url 'sync_repository' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="repositorio_url" value="{{ repo.url }}">
+                                <input type="hidden" name="form_type" value="update"> <button type="submit"
+                                    class="btn btn-primary btn-sm">Atualizar</button>
+                            </form>
+                            <a href="{% url 'delete_repository' repo.id %}">
+                                <button class="btn btn-danger btn-sm ms-1">Deletar</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% include 'shared/pagination.html' with page_data=db_repos page_name='db_page' %}
+        </div>
+    </div>
+</main>
+
+{% endblock %}
