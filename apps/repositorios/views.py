@@ -46,6 +46,8 @@ def add_or_update_repository(request):
 
 def list_repositories(request):
     git_repos = list_git_repositories(request)
+
+    git_repos = sorted(git_repos, key=lambda x: x.is_registered, reverse=True)
     db_repos = list_database_repositories(request)
 
     if not git_repos and not db_repos:
@@ -75,6 +77,7 @@ def list_database_repositories(request):
     )
 
 
+@check_authentication
 def list_git_repositories(request):
     response = requests.get(
         GITHUB_GET_REPOSITORIES,
@@ -158,7 +161,7 @@ def create_repository(request, repo, stats, score):
 def update_repository(request, repo, stats, score):
     commits, lines, languages, issues, pulls = stats
 
-    Repositorio.objects.filter(repository_id=repo.id).update(
+    Repositorio.objects.filter(repository_id=repo.repo_id).update(
         stars=repo.stars,
         languages=languages,
         commit_count=commits,
@@ -167,6 +170,7 @@ def update_repository(request, repo, stats, score):
         pulls_count=pulls,
         score=score,
     )
+    messages.success(request, "Repositório atualizado com sucesso!")
 
 
 def is_registered(request, repo_id):

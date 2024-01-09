@@ -31,7 +31,7 @@
                 </div>
             </div>
             {% endfor %}
-            {% include 'shared/pagination.html' with page_data=git_repos %}
+            {% include 'shared/pagination.html' with page_data=git_repos page_name='git_page' %}
         </div>
         <div class="col-lg-6">
             {% for repo in db_repos %}
@@ -102,7 +102,7 @@
                 </div>
             </div>
             {% endfor %}
-            {% include 'shared/pagination.html' with page_data=db_repos %}
+            {% include 'shared/pagination.html' with page_data=db_repos page_name='db_page' %}
         </div>
     </div>
 </main>
