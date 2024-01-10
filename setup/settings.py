@@ -43,6 +43,8 @@ MYSQL_ROOT_PASSWORD = os.getenv("MYSQL_ROOT_PASSWORD")
 MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
 MYSQL_USER = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+MYSQL_HOST = os.getenv("MYSQL_HOST")
+MYSQL_PORT = os.getenv("MYSQL_PORT")
 
 
 # Quick-start development settings - unsuitable for production
@@ -111,8 +113,8 @@ DATABASES = {
         "NAME": MYSQL_DATABASE,
         "USER": MYSQL_USER,
         "PASSWORD": MYSQL_PASSWORD,  # Senha do MySQL
-        "HOST": "db",  # Nome do serviço no Docker Compose
-        "PORT": "3306",
+        "HOST": MYSQL_HOST,  # Nome do serviço no Docker Compose
+        "PORT": MYSQL_PORT,
     }
 }
 

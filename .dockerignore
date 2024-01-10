@@ -1,0 +1,41 @@
+# Arquivos do sistema
+.git
+.gitignore
+.dockerignore
+
+# Dependências
+venv/
+env/
+.venv/
+
+# Arquivos de log
+*.log
+
+# Arquivos de cache
+__pycache__/
+*.pyc
+
+# Arquivos de teste
+test/
+tests/
+
+# Arquivos de documentação
+docs/
+
+# Arquivos de build
+build/
+dist/
+*.egg-info/
+
+# Arquivos de configuração
+.env
+.flaskenv
+
+# Arquivos grandes desnecessários
+*.tgz
+*.zip
+*.tar.gz
+
+# Outros arquivos desnecessários 
+README.md
+LICENSE
