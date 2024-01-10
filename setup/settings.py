@@ -114,7 +114,7 @@ DATABASES = {
         "USER": MYSQL_USER,
         "PASSWORD": MYSQL_PASSWORD,  # Senha do MySQL
         "HOST": MYSQL_HOST,  # Nome do serviço no Docker Compose
-        "PORT": MYSQL_PORT,
+        "PORT": "3306",
     }
 }
 
