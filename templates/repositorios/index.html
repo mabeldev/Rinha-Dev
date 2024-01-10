@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-lg-6">
             <h1>Bem-vindo ao Rinha Dev</h1>
-            <p>Descrição do projeto...</p>
+            <p>Atualmente, o projeto visa promover uma competição amigável entre os desenvolvedores cadastrados na plataforma. Os participantes podem fazer login através do GitHub, cadastrar seus repositórios públicos e serão pontuados com base neles, gerando um ranking dos participantes.</p>
             {% if user.is_authenticated %}
             <a class="btn btn-success btn-lg" href="{% url 'repositories' %}" role="button">Meus Repositorios</a>
             {% else %}
