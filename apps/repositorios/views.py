@@ -189,7 +189,7 @@ def get_commit_count(request, url):
         return sum(
             1
             for c in response.json()
-            if c["author"]["login"] == request.user
+            if c["author"]["login"] == request.user.username
         )
 
 
