@@ -6,7 +6,4 @@ from apps.repositorios.models import Repositorio
 
 class CustomUser(AbstractUser):
     token = models.CharField(max_length=255)
-    repositorios = models.ManyToManyField(Repositorio) 
-
-
-
+    repositorios = models.ManyToManyField(Repositorio)

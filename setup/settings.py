@@ -39,6 +39,11 @@ LINES_MULTIPLIER = os.getenv("LINES_MULTIPLIER")
 ISSUES_MULTIPLIER = os.getenv("ISSUES_MULTIPLIER")
 PULLS_MULTIPLIER = os.getenv("PULLS_MULTIPLIER")
 
+MYSQL_ROOT_PASSWORD = os.getenv("MYSQL_ROOT_PASSWORD")
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+MYSQL_USER = os.getenv("MYSQL_USER")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -95,14 +100,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "setup.wsgi.application"
 
+DOCKER_DB_DIR = "/app/db.sqlite3"
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": MYSQL_DATABASE,
+        "USER": MYSQL_USER,
+        "PASSWORD": MYSQL_PASSWORD,  # Senha do MySQL
+        "HOST": "db",  # Nome do serviço no Docker Compose
+        "PORT": "3306",
     }
 }
 
