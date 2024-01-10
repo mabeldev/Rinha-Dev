@@ -3,7 +3,7 @@
 <main class="container mt-5">
     <div class="row">
         <div class="col-lg-6">
-            <h1 class="display-20">Repositórios <i class="bi bi-github"></i>GitHub</h1>
+            <h1 class="display-20">Seus Repositórios <i class="bi bi-github"></i>GitHub</h1>
             {% for repo in git_repos %}
             <div class="card mb-3">
                 <div class="card-body">
@@ -35,7 +35,7 @@
             {% include 'shared/pagination.html' with page_data=git_repos page_name='git_page' %}
         </div>
         <div class="col-lg-6">
-            <h1 class="display-20">Repositórios <i class="bi bi-archive">Salvos</i> </h1>
+            <h1 class="display-20">Repositórios Na <i class="bi bi-bandaid"></i>Rinha</h1>
             {% for repo in db_repos %}
             <div class="card mb-3">
                 <div class="card-body">
