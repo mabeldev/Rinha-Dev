@@ -58,7 +58,8 @@ DEBUG = os.getenv("DEBUG")
 
 if DEBUG:
     ALLOWED_HOSTS = []
-ALLOWED_HOSTS = [str(os.getenv("URL_HOST"))]
+else:
+    ALLOWED_HOSTS = [str(os.getenv("URL_HOST"))]
 
 
 # Application definition
