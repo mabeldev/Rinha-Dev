@@ -28,7 +28,7 @@ GITHUB_CLIENT_SECRET = str(os.getenv("GITHUB_CLIENT_SECRET"))
 GITHUB_GET_REPOSITORIES = "https://api.github.com/user/repos"
 GITHUB_GET_REPOSITORY = "https://api.github.com/repos/{owner}/{name}"
 GITHUB_OAUTH_URL = "https://github.com/login/oauth/"
-GITHUB_REDIRECT_URI = "http://localhost:8000/callback"
+GITHUB_REDIRECT_URI = str(os.getenv("GITHUB_REDIRECT_URI"))
 
 # GITHUB CONCAT PATHS
 GITHUB_GET_USER_CODE = f"{GITHUB_OAUTH_URL}authorize?client_id={GITHUB_CLIENT_ID}&redirect_uri={GITHUB_REDIRECT_URI}&scope=user"
