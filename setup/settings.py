@@ -107,24 +107,24 @@ DOCKER_DB_DIR = "/app/db.sqlite3"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-if os.getenv("DOCKER_DB") == "True":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.mysql",
-            "NAME": MYSQL_DATABASE,
-            "USER": MYSQL_USER,
-            "PASSWORD": MYSQL_PASSWORD,  # Senha do MySQL
-            "HOST": MYSQL_HOST,  # Nome do serviço no Docker Compose
-            "PORT": "3306",
-        }
+# if os.getenv("DOCKER_DB") == "True":
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.mysql",
+#             "NAME": MYSQL_DATABASE,
+#             "USER": MYSQL_USER,
+#             "PASSWORD": MYSQL_PASSWORD,  # Senha do MySQL
+#             "HOST": MYSQL_HOST,  # Nome do serviço no Docker Compose
+#             "PORT": "3306",
+#         }
+#     }
+# else:
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
 
 
 # Password validation
