@@ -2,7 +2,7 @@ version: '3'
 
 services:
   web:
-    image: wilsonsantosphx/rinhadev_mabel:latest
+    image: alissondemys/rinha_dev:latest
     command: >
           sh -c "
                 python manage.py makemigrations && 
