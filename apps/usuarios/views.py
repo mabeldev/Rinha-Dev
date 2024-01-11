@@ -68,7 +68,8 @@ def add_or_update_user(user_data, token):
     username = user_data["login"]
     email = user_data["email"]
 
-    user = CustomUser.objects.filter(email=email).first()
+    user = CustomUser.objects.filter(username=username).first()
+
     if user:
         user.token = token
         user.save()
