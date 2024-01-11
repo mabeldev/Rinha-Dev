@@ -58,8 +58,10 @@ DEBUG = os.getenv("DEBUG") == "True"
 DOCKER = os.getenv("DOCKER") == "True"
 
 if DEBUG:
+    print("DEBUG MODE")
     ALLOWED_HOSTS = []
 else:
+    print("PRODUCTION MODE")
     ALLOWED_HOSTS = [str(os.getenv("URL_HOST"))]
 
 
@@ -107,6 +109,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "setup.wsgi.application"
 
 if DOCKER:
+    print("DOCKER MODE")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.mysql",
@@ -118,6 +121,7 @@ if DOCKER:
         }
     }
 else:
+    print("LOCAL MODE")
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",

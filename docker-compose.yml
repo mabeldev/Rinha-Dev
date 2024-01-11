@@ -1,15 +1,8 @@
 version: '3'
 
 services:
-  web:
-    image: alissondemys/rinha_dev:latest
-    restart: always
-    ports:
-      - "${APP_PORT}:8000"
-    depends_on:
-      - db
   db:
-    image: mariadb:latest
+    image: mysql:latest
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -20,6 +13,18 @@ services:
       - dbdata:/var/lib/mysql
     ports:
       - "${MYSQL_PORT}:3306"
+  
+  web:
+    image: alissondemys/rinha_dev:latest
+    command: >
+          sh -c "
+              python manage.py migrate &&
+              python manage.py runserver 0.0.0.0:8000"
+    restart: always
+    ports:
+      - "${APP_PORT}:8000"
+    depends_on:
+      - db
 
 volumes:
   dbdata:

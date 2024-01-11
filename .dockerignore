@@ -28,7 +28,6 @@ dist/
 *.egg-info/
 
 # Arquivos de configuração
-.env
 .flaskenv
 
 # Arquivos grandes desnecessários
