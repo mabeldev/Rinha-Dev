@@ -29,6 +29,7 @@ dist/
 
 # Arquivos de configuração
 .flaskenv
+.env
 
 # Arquivos grandes desnecessários
 *.tgz

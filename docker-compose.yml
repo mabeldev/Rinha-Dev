@@ -16,8 +16,9 @@ services:
   
   web:
     image: alissondemys/rinha_dev:latest
+    env_file: .env
     command: >
-          sh -c "
+          sh -c "              
               python manage.py migrate &&
               python manage.py runserver 0.0.0.0:8000"
     restart: always
