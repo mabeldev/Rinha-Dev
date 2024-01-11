@@ -106,9 +106,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "setup.wsgi.application"
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 if DOCKER:
     DATABASES = {
         "default": {
