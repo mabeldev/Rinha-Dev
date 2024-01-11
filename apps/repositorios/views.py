@@ -190,6 +190,8 @@ def get_commit_count(request, url):
             for c in response.json()
             if c["author"]["login"] == request.user.username
         )
+    else:
+        return 0
 
 
 def get_line_count(request, url):
