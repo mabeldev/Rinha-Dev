@@ -54,7 +54,8 @@ MYSQL_PORT = str(os.getenv("MYSQL_PORT"))
 SECRET_KEY = str(os.getenv("SECRET_KEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv("DEBUG")
+DEBUG = os.getenv("DEBUG") == "True"
+DOCKER = os.getenv("DOCKER") == "True"
 
 if DEBUG:
     ALLOWED_HOSTS = []
@@ -108,17 +109,24 @@ WSGI_APPLICATION = "setup.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": MYSQL_DATABASE,
-        "USER": MYSQL_USER,
-        "PASSWORD": MYSQL_PASSWORD,  # Senha do MySQL
-        "HOST": MYSQL_HOST,  # Nome do serviço no Docker Compose
-        "PORT": "3306",
+if DOCKER:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": MYSQL_DATABASE,
+            "USER": MYSQL_USER,
+            "PASSWORD": MYSQL_PASSWORD,  # Senha do MySQL
+            "HOST": MYSQL_HOST,  # Nome do serviço no Docker Compose
+            "PORT": "3306",
+        }
     }
-}
-
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
