@@ -75,7 +75,6 @@ def list_database_repositories(request):
     return request.user.repositorio_set.all()
 
 
-
 def list_git_repositories(request):
     response = requests.get(
         GITHUB_GET_REPOSITORIES,
@@ -191,6 +190,8 @@ def get_commit_count(request, url):
             for c in response.json()
             if c["author"]["login"] == request.user.username
         )
+    else:
+        return 0
 
 
 def get_line_count(request, url):
