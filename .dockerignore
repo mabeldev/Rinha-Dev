@@ -4,6 +4,7 @@
 .dockerignore
 
 # Dependências
+nginx/
 venv/
 env/
 .venv/

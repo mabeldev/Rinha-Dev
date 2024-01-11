@@ -5,9 +5,11 @@ charset-normalizer==3.3.2
 cryptography==41.0.7
 defusedxml==0.8.0rc2
 Django==5.0.1
+gunicorn==21.2.0
 idna==3.6
 mysqlclient==2.2.1
 oauthlib==3.2.2
+packaging==23.2
 pycparser==2.21
 PyJWT==2.8.0
 python-dotenv==1.0.0
