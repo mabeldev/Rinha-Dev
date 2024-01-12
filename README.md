@@ -1,7 +1,7 @@
 # Rinha - Dev
 
 ## Sobre o projeto
-Este projeto foi desenvolvido como um desafio proposto pelo meu amigo e colega de trabalho, Wilson Sanos. Surgiu da necessidade de consolidar meus conhecimentos em uma nova linguagem de programação, após meu chefe na empresa onde trabalho solicitar que eu aprendesse Python para contribuir em novos projetos.
+Este projeto foi desenvolvido como um desafio proposto pelo meu amigo e colega de trabalho, Wilson Santos. Surgiu da necessidade de consolidar meus conhecimentos em uma nova linguagem de programação, após meu chefe na empresa onde trabalho solicitar que eu aprendesse Python para contribuir em novos projetos.
 
 Atualmente, o projeto visa promover uma competição amigável entre os desenvolvedores cadastrados na plataforma. Os participantes podem fazer login através do GitHub, cadastrar seus repositórios públicos e serão pontuados com base neles, gerando um ranking dos participantes.
 ## Pre-requisitos
