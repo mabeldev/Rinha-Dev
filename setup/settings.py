@@ -62,7 +62,12 @@ if DEBUG:
     ALLOWED_HOSTS = []
 else:
     print("PRODUCTION MODE")
-    ALLOWED_HOSTS = ['localhost', '127.0.0.1', str(os.getenv("URL_HOST"))]
+    ALLOWED_HOSTS = [
+        "localhost",
+        "127.0.0.1",
+        str(os.getenv("URL_HOST")),
+        str(os.getenv("DOMAIN_URL")),
+    ]
 
 
 # Application definition
