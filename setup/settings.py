@@ -45,7 +45,8 @@ MYSQL_USER = os.getenv("MYSQL_USER")
 MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 MYSQL_HOST = str(os.getenv("MYSQL_HOST"))
 MYSQL_PORT = str(os.getenv("MYSQL_PORT"))
-
+URL_HOST = str(os.getenv("URL_HOST"))
+DOMAIN_URL = str(os.getenv("DOMAIN_URL"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -65,8 +66,8 @@ else:
     ALLOWED_HOSTS = [
         "localhost",
         "127.0.0.1",
-        str(os.getenv("URL_HOST")),
-        str(os.getenv("DOMAIN_URL")),
+        URL_HOST,
+        DOMAIN_URL,
     ]
 
 
@@ -133,6 +134,12 @@ else:
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+
+
+##CSRF ALLOWED ORIGINS
+CSRF_TRUSTED_ORIGINS = [
+    f'https://{DOMAIN_URL}',
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
