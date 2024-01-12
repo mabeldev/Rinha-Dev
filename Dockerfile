@@ -8,13 +8,20 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 # Cria e define o diretório de trabalho dentro do contêiner
-WORKDIR /app
+WORKDIR /usr/src/app
 
 # Copia o arquivo requirements.txt para o diretório de trabalho
-COPY requirements.txt /app/
+COPY requirements.txt ./
 
 # Instala as dependências listadas no requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
 
 # Copia o código fonte da aplicação para o contêiner
-COPY . /app/
+COPY . .
+
+# Executa o comando collectstatic
+RUN python manage.py collectstatic --noinput
+
+# Inicia o Gunicorn
+CMD ["gunicorn", "setup.wsgi:application", "--bind", "0.0.0.0:8000"]

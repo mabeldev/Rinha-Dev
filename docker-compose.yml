@@ -17,9 +17,8 @@ services:
   web:
     image: alissondemys/rinha_dev:latest
     env_file: .env
-    command: gunicorn setup.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - ./app/:/usr/src/app/
+      - static_volume:/usr/src/app/static
     ports:
       - "${APP_PORT}:8000"
     depends_on:
@@ -29,6 +28,7 @@ services:
     image: nginx:latest
     volumes:
       - ./nginx:/etc/nginx/conf.d
+      - static_volume:/usr/share/nginx/html/static
     ports:
       - 8087:80
     depends_on:
@@ -36,3 +36,4 @@ services:
 
 volumes:
   dbdata:
+  static_volume:

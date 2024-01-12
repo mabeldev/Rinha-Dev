@@ -62,7 +62,7 @@ if DEBUG:
     ALLOWED_HOSTS = []
 else:
     print("PRODUCTION MODE")
-    ALLOWED_HOSTS = [str(os.getenv("URL_HOST"))]
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', str(os.getenv("URL_HOST"))]
 
 
 # Application definition
@@ -163,10 +163,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "/static_files/"
+STATIC_URL = "/static/"
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "setup/static/")]
-STATIC_ROOT = os.path.join(BASE_DIR, "static_files/")
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 
 # Default primary key field type
