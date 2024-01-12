@@ -25,7 +25,7 @@ COPY . .
 RUN python manage.py collectstatic --noinput
 
 # Inicia o Gunicorn
-CMD ["sh", "-c", "./wait-for-db.sh && python manage.py migrate && gunicorn setup.wsgi:application --bind 0.0.0.0:8000"]
+CMD ["sh", "-c", "./wait-for-db.sh && python manage.py migrate && gunicorn --log-level debug --error-logfile - --access-logfile - setup.wsgi:application --bind 0.0.0.0:8000"]
 
 
 
