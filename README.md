@@ -118,8 +118,10 @@ Nessa tela você será capaz de:
 ## Tecnologias utilizadas
 * Python
 * Django
-*  Docker
-*  MySQL
-
+* Docker
+* MySQL
+* Gunicorn
+* NGINX
+  
 
 _ps: as imagens utilizadas nesse site foram geradas por ia (edge image creator)_
