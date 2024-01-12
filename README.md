@@ -10,22 +10,84 @@ Atualmente, o projeto visa promover uma competição amigável entre os desenvol
 - [Docker](https://www.docker.com/products/docker-desktop/)
 - .env file
 
-## Como iniciar
-1. Clone o repositório ou baixe o arquivo zipado.
-  
-2. Adicione o arquivo .env a raiz do projeto
-   
-3. Build o Docker
-```bash
-docker build .
+## Instruções para .env
+1. Crie um GitHub APP: [GitHub Apps](https://docs.github.com/pt/apps/creating-github-apps)
+
+2. Preencha as informaçoes abaixo:
+```
+GITHUB_CLIENT_ID=seu_client_id_do_github
+GITHUB_CLIENT_SECRET=seu_client_secret_do_github
+GITHUB_REDIRECT_URI="http://localhost:8000/callback"
+URL_HOST="http://localhost:8000"
 ```
 
+3. Caso vá utilizar com Docker (Confome configurado no `GitHub APP`)
+```
+GITHUB_REDIRECT_URI="http://localhost:8087/callback"
+URL_HOST="http://web:8000"
+```
+
+4. Caso vá utilizar LocalHost (Confome configurado no `GitHub APP`)
+```
+GITHUB_REDIRECT_URI="http://localhost:8000/callback"
+URL_HOST="http://localhost:8000/"
+```
+
+## Como iniciar (Docker)
+1. Clone o repositório ou baixe o arquivo zipado.
+  
+2. Adicione o arquivo .env a raiz do projeto.
+```yaml
+Garanta que no seu .env as seguintes variáveis estejam assim:
+DOCKER = True
+DEBUG = False
+```
+    
 4. Inicie o container do Docker
 ```bash
 docker-compose up -d
 ```
 
-5. Acesse `http://localhost:8000/`
+5. Acesse `http://localhost:8087/`
+
+## Como iniciar (LocalHost)
+1. Clone o repositório ou baixe o arquivo zipado.
+   
+2. Adicione o arquivo .env a raiz do projeto
+   
+
+4. Instale o ambiente virtual:
+
+   (WINDOWS)
+   ```
+   virtualenv ./venv
+   ```
+   (LINUX)
+   ```
+   python3 -m venv venv
+   ```
+5. Ative o ambiente virtal:
+
+   (WINDOWS)
+   ```
+   .\venv\Scripts\Activate
+   ```
+   (LINUX)
+   ```
+   source venv/bin/activate
+   ```
+
+6. Insale as dependencias:
+
+   (WINDOWS/LINUX)
+   ```
+    pip install -r requirements.txt
+   ```
+ 7. Rode o seu projeto com:
+    ```
+    python manage.py runserver
+    ```
+    Acesse: `http://localhost:8000/`
 
 ## Como utilizar
 ### Pagina inicial:
